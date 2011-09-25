@@ -47,13 +47,14 @@ def main():
   sc = oldsc.copy()
   if not opts.is_pullup is None:
     sc.is_pullup = opts.is_pullup 
-  sc.portIO = ((toInt(opts.port1) if opts.port1 is not None else sc.portIO[0]), 
-               (toInt(opts.port2) if opts.port2 is not None else sc.portIO[1]))
-  sc.init = ((toInt(opts.init1) if opts.init1 is not None else sc.init[0]), 
-             (toInt(opts.init2) if opts.init2 is not None else sc.init[1]))
+  sc.port1 = toInt(opts.port1) if opts.port1 is not None else sc.port1
+  sc.port2 = toInt(opts.port2) if opts.port2 is not None else sc.port2
+  sc.init1 = toInt(opts.init1) if opts.init1 is not None else sc.init1
+  sc.init2 = toInt(opts.init2) if opts.init2 is not None else sc.init2
   dev.setSysConf(sc)
-  print dev.getSysConf()
-  print "Setting Complete. You most reconect USB-IO from your PC."
+
+  print "Setting Complete. "
+  print "NOTICE:If you use this settings, You most reconnect USB-IO from your PC."
 
 
 if __name__ == '__main__':

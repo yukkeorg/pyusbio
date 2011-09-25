@@ -1,15 +1,27 @@
 #!/usr/bin/env python
 
-import time
 import usb.core
 import usb.util
 
+# Device Information
+VENDOR_ID = 0x1352       # Km2Net
+PRODUCT_ID_ORIG = 0x0120 # USB-IO2.0 ORIGINAL
+PRODUCT_ID_AKI = 0x0121  # USB-IO2.0(AKI)
+
+# Command list
+CMD_READ_SEND = 0x20
+CMD_SEND_READ = 0x21
+CMD_SEND_REPEAT = 0x22
+CMD_FLASHROM_READ = 0xf0
+CMD_FLASHROM_WRITE = 0xf1
+CMD_SYSCONF_READ = 0xf8
+CMD_SYSCONF_WRITE = 0xf9
+
+TIMEOUT = 5000
+MAX_CMD_LENGTH = 64
+
 
 class USBIO(object):
-  VENDOR_ID = 0x1352      # Km2Net
-  PRODUCT_ID_ORIG = 0x0120 # USB-IO2.0 ORIGINAL
-  PRODUCT_ID_AKI = 0x0121  # USB-IO2.0(AKI)
-
   def __init__(self):
     self.device = None
     self.is_aki = False
@@ -18,12 +30,12 @@ class USBIO(object):
     self._seq = 0
 
   def find_and_init(self):
-    for product_id in (USBIO.PRODUCT_ID_ORIG, USBIO.PRODUCT_ID_AKI):
+    for product_id in (PRODUCT_ID_ORIG, PRODUCT_ID_AKI):
       self.device = usb.core.find(idVendor=USBIO.VENDOR_ID, idProduct=product_id)
       if self.device:
-        if product_id == USBIO.PRODUCT_ID_AKI:
+        if product_id == PRODUCT_ID_AKI:
           self.is_aki = True
-        print("USB-IO(0x{0:x}, 0x{1:x}) is found.".format(USBIO.VENDOR_ID, product_id))
+        print("USB-IO(0x{0:x}, 0x{1:x}) is found.".format(VENDOR_ID, product_id))
         break
     if not self.device:
       print("USB-IO Device is NOT found.")
@@ -48,7 +60,7 @@ class USBIO(object):
     return True
 
 
-  def _cmd(self, command, writedata=None, do_read=True, cmdsize=64):
+  def _cmd(self, command, writedata=None, do_read=True, cmdsize=MAX_CMD_LENGTH):
     self._seq = (self._seq + 1) & 0xff
 
     cmd = [0x00] * cmdsize
@@ -61,12 +73,12 @@ class USBIO(object):
       for i in xrange(length):
         cmd[i+1] = writedata[i]
 
-    sendsize = self.device.write(self.outEpAddr, cmd, 0, 5000)
+    sendsize = self.device.write(self.outEpAddr, cmd, 0, TIMEOUT)
     if sendsize != cmdsize:
       return False
 
     if do_read:
-      data = self.device.read(self.inEpAddr, cmdsize)
+      data = self.device.read(self.inEpAddr, cmdsize, TIMEOUT)
       if data[0] != cmd[0] or data[cmdsize-1] != cmd[cmdsize-1]:
         raise ValueError, "Different recived data."
       return data[1:cmdsize-1]
@@ -75,39 +87,45 @@ class USBIO(object):
 
 
   def send2read(self, setdata=None):
-    return (self._cmd(0x20, writedata=setdata))[0:2]
+    return (self._cmd(CMD_READ_SEND, writedata=setdata))[0:2]
 
   def getSysConf(self):
     sc = SysConf()
-    return sc.fromArray(self._cmd(0xf8))
+    return sc.fromArray(self._cmd(CMD_SYSCONF_READ))
 
   def setSysConf(self, sysconf):
     if not isinstance(sysconf, SysConf):
       raise TypeError, "sysconf is not SysConf type."
-    return self._cmd(0xf9, writedata=sysconf.toArray(), do_read=False)
+    return self._cmd(CMD_SYSCONF_WRITE, writedata=sysconf.toArray(), do_read=False)
 
 
 class SysConf(object):
-  def __init__(self, is_pullup=True, portIO=None, init=None):
+  def __init__(self, is_pullup=True, port1=0x00, port2=0x0f, init1=0x00, init2=0x00):
     self.is_pullup = is_pullup
-    self.portIO = portIO or (0x00, 0x0f)
-    self.init = init or (0x00, 0x00)
+    self.port1 = port1
+    self.port2 = port2
+    self.init1 = init1
+    self.init2 = init2
 
   def toArray(self):
-    data = [0] * 62
+    data = [0] * (MAX_CMD_LENGTH - 2)
     data[1] = 0 if self.is_pullup else 1
-    data[4],data[5] = self.portIO
-    data[8],data[9] = self.init
+    data[4] = self.port1
+    data[5] = self.port2
+    data[8] = self.init1
+    data[9] = self.init2
     return data
 
-  def fromArray(self, ar):
-    self.is_pullup = (ar[1] == 0)
-    self.portIO = (ar[4], ar[5])
-    self.init = (ar[8], ar[9])
+  def fromArray(self, data):
+    self.is_pullup = (data[1] == 0)
+    self.port1 = data[4]
+    self.port2 = data[5]
+    self.init1 = data[8]
+    self.init2 = data[9]
     return self
 
   def copy(self):
-    return SysConf(self.is_pullup, self.portIO, self.init)
+    return SysConf(self.is_pullup, self.port1, self.port2, self.init1, self.init2)
 
   def __repr__(self):
     return "<SysConf is_pullup={is_pullup}, portIO={portIO}, init={init}>".format(**self.__dict__)
