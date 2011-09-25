@@ -31,7 +31,7 @@ class USBIO(object):
 
   def find_and_init(self):
     for product_id in (PRODUCT_ID_ORIG, PRODUCT_ID_AKI):
-      self.device = usb.core.find(idVendor=USBIO.VENDOR_ID, idProduct=product_id)
+      self.device = usb.core.find(idVendor=VENDOR_ID, idProduct=product_id)
       if self.device:
         if product_id == PRODUCT_ID_AKI:
           self.is_aki = True
@@ -73,12 +73,12 @@ class USBIO(object):
       for i in xrange(length):
         cmd[i+1] = writedata[i]
 
-    sendsize = self.device.write(self.outEpAddr, cmd, 0, TIMEOUT)
+    sendsize = self.device.write(self.outEpAddr, cmd, timeout=TIMEOUT)
     if sendsize != cmdsize:
       return False
 
     if do_read:
-      data = self.device.read(self.inEpAddr, cmdsize, TIMEOUT)
+      data = self.device.read(self.inEpAddr, cmdsize, timeout=TIMEOUT)
       if data[0] != cmd[0] or data[cmdsize-1] != cmd[cmdsize-1]:
         raise ValueError, "Different recived data."
       return data[1:cmdsize-1]
