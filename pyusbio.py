@@ -37,6 +37,11 @@ VENDOR_ID = 0x1352       # Km2Net
 PRODUCT_ID_ORIG = 0x0120 # USB-IO2.0 ORIGINAL
 PRODUCT_ID_AKI = 0x0121  # USB-IO2.0(AKI)
 
+# Number of ports
+N_PORT1 = 8
+N_PORT2 = 4
+N_PORT = N_PORT1 + N_PORT2
+
 # Command list
 # Detail to see : http://km2net.com/usb-fsio/command.shtml
 CMD_READ_SEND = 0x20
@@ -69,7 +74,7 @@ class USBIO(object):
         logger.info("USB-IO(0x{0:x}, 0x{1:x}) is found.".format(VENDOR_ID, product_id))
         break
     if not self.device:
-      logger.error("USB-IO Device is NOT found.", file=sys.stderr)
+      logger.error("USB-IO Device is NOT found.")
       return False
 
     for cnf in self.device:
