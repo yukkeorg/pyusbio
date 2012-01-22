@@ -2,9 +2,8 @@
  >>> import pyusbio
  >>> usbio = usbio.USBIO()
  >>> if usbio.find_and_init():
- ...   for i in range(5):
- ...     port0, port1 = usbio.send2read()
- ...     print("{0:x}, {1:x}".format(port0, port1))
+ ...   port0, port1 = usbio.send2read([0x00, 0x01])
+ ...   print("{0:x}, {1:x}".format(port0, port1))
 
 制限事項：
  * 現在１つのUSB-IOしか認識できません。
