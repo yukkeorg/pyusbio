@@ -104,8 +104,7 @@ class USBIO(object):
     cmd[cmdsize-1] = self._seq
 
     if writedata:
-      length = len(writedata)
-      if length > cmdsize-2: length = cmdsize-2
+      length = min(len(writedata), cmdsize-2)
       for i in xrange(length):
         cmd[i+1] = writedata[i]
 
