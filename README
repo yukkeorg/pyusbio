@@ -12,8 +12,8 @@
  　Windows環境での動作テストを行なっていません。 
 
 ライセンス：
- MIT License
-
+ 2条項BSDライセンス
+ 2-clause BSD License
 
 おまけ：
  付属のusbio_config.pyは、USB-IO2.0の内部設定を変更するツールです。
