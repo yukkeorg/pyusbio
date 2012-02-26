@@ -32,8 +32,8 @@ def toInt(val):
 def main():
   parser = OptionParser()
   parser.add_option("--show", action="store_true", dest="show", help="Display USB-IO System config.")
-  parser.add_option("--enable-pullup", action="store_true", dest="is_pullup", help="Enable Port1 pullup.")
-  parser.add_option("--disable-pullup", action="store_false", dest="is_pullup", help="Disable Port1 pullup.")
+  parser.add_option("--enable-pullup", action="store_true", dest="is_pullup", help="Enable Port2 pullup.")
+  parser.add_option("--disable-pullup", action="store_false", dest="is_pullup", help="Disable Port2 pullup.")
   parser.add_option("--port1", dest="port1", help="Port1 pin setting. 0bxxxxxxxx [7..0], x=[0:Out, 1:In]")
   parser.add_option("--port2", dest="port2", help="Port2 pin setting. 0b0000xxxx [3..0], x=[0:Out, 1:In]")
   parser.add_option("--init1", dest="init1", help="Port1 default value. (ORIG only)")
@@ -53,10 +53,10 @@ def main():
   _sc = dev.getSysConf()
   if opts.show:
     print("Port2 Pullup : {0}".format("Enable" if _sc.is_pullup else "Disable"))
-    print("Port1 Pin setting : {0:0>8b}(0x{0:02x})".format(_sc.port1))
-    print("Port2 Pin setting : {0:0>8b}(0x{0:02x})".format(_sc.port2))
-    print("Port1 Pin default value : {0:0>8b}(0x{0:02x})".format(_sc.init1))
-    print("Port2 Pin default value : {0:0>8b}(0x{0:02x})".format(_sc.init2))
+    print("Port1 Pin setting : 0b{0:0>8b}(0x{0:02x})".format(_sc.port1))
+    print("Port2 Pin setting : 0b{0:0>8b}(0x{0:02x})".format(_sc.port2))
+    print("Port1 Pin default value : 0b{0:0>8b}(0x{0:02x})".format(_sc.init1))
+    print("Port2 Pin default value : 0b{0:0>8b}(0x{0:02x})".format(_sc.init2))
     sys.exit(0)
     
     
