@@ -17,7 +17,7 @@ pyusbio
 
 ライセンス
 ----------
- 2条項BSDライセンス
+ 2条項BSDライセンス  
  2-clause BSD License
 
 おまけ
