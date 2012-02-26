@@ -87,24 +87,25 @@ class USBIO(object):
 
     if writedata:
       length = min(len(writedata), cmdsize-2)
-      for i in xrange(length):
+      for i in range(length):
         cmd[i+1] = writedata[i]
 
     sendsize = self.device.write(self.outEpAddr, cmd, timeout=self._timeout)
     if sendsize != cmdsize:
-      return False
+      return None
 
     if do_read:
       data = self.device.read(self.inEpAddr, cmdsize, timeout=self._timeout)
       if data[0] != cmd[0] or data[cmdsize-1] != cmd[cmdsize-1]:
-        raise ValueError, "Different recived data."
+        raise ValueError("Different recived data.")
       return data[1:cmdsize-1]
     else:
-      return True
+      return []
 
 
   def send2read(self, setdata=None):
-    return (self._cmd(CMD_READ_SEND, writedata=setdata))[0:2]
+    data = self._cmd(CMD_READ_SEND, writedata=setdata) 
+    return data[0:2]
 
 
   def getSysConf(self):
@@ -114,7 +115,7 @@ class USBIO(object):
 
   def setSysConf(self, sysconf):
     if not isinstance(sysconf, SysConf):
-      raise TypeError, "sysconf is not SysConf type."
+      raise TypeError("sysconf is not SysConf type.")
     return self._cmd(CMD_SYSCONF_WRITE, writedata=sysconf.toArray(), do_read=False)
 
 
