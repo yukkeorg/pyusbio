@@ -36,69 +36,80 @@ CMD_SYSCONF_WRITE = 0xf9
 
 MAX_CMD_LENGTH = 64
 
+class PyUSBIOError(Exception): pass
 
 class USBIO(object):
   def __init__(self, timeout=5000):
-    self.device = None
-    self.is_aki = False
-    self.inEpAddr = 0
-    self.outEpAddr = 0
+    self._device = None
+    self._inEpAddr = 0
+    self._outEpAddr = 0
+    self._cmdsize = 0
     self._seq = 0
     self._timeout = timeout
+    self.is_aki = False
 
 
   def find_and_init(self):
     for product_id in (PRODUCT_ID_ORIG, PRODUCT_ID_AKI):
-      self.device = usb.core.find(idVendor=VENDOR_ID, idProduct=product_id)
-      if self.device:
-        if product_id == PRODUCT_ID_AKI:
+      self._device = usb.core.find(idVendor=VENDOR_ID, idProduct=product_id)
+      if self._device:
+        self._cmdsize = 64
+        if product_id == PRODUCT_ID_ORIG:
+          self.is_aki = False
+        elif product_id == PRODUCT_ID_AKI:
           self.is_aki = True
+        else:
+          raise PyUSBIOError("Unknown PRODUCT_ID: 0x{0:x}".format(product_id))
+        
         logger.info("USB-IO(0x{0:x}, 0x{1:x}) is found.".format(VENDOR_ID, product_id))
         break
-    if not self.device:
+    if not self._device:
       logger.error("USB-IO Device is NOT found.")
       return False
 
-    for cnf in self.device:
+    for cnf in self._device:
       for ifc in cnf:
         for ep in ifc:
           if ep.bEndpointAddress & usb.util._ENDPOINT_DIR_MASK:
-            self.inEpAddr = ep.bEndpointAddress
+            self._inEpAddr = ep.bEndpointAddress
             logger.debug("IN endpoint address of interface {0} : 0x{1:x}" \
                    .format(ifc.bInterfaceNumber, ep.bEndpointAddress))
           else:
-            self.outEpAddr = ep.bEndpointAddress
+            self._outEpAddr = ep.bEndpointAddress
             logger.debug("OUT endpoint address of interface {0} : 0x{1:x}" \
                    .format(ifc.bInterfaceNumber, ep.bEndpointAddress))
 
-        if self.device.is_kernel_driver_active(ifc.bInterfaceNumber):
-          self.device.detach_kernel_driver(ifc.bInterfaceNumber)
-          logger.info("interface {0} of USB-IO was detached from the kernel driver." \
+        if self._device.is_kernel_driver_active(ifc.bInterfaceNumber):
+          self._device.detach_kernel_driver(ifc.bInterfaceNumber)
+          logger.info("interface {0} of USB-IO is detached from the kernel driver." \
                    .format(ifc.bInterfaceNumber))
     return True
 
 
-  def _cmd(self, command, writedata=None, do_read=True, cmdsize=MAX_CMD_LENGTH):
+  def _cmd(self, command, writedata=None, do_read=True):
+    if self._device is None:
+      raise PyUSBIOError("self._device is None.")
+
     self._seq = (self._seq + 1) & 0xff
 
-    cmd = [0x00] * cmdsize
+    cmd = [0x00] * self._cmdsize
     cmd[0] = command
-    cmd[cmdsize-1] = self._seq
+    cmd[self._cmdsize-1] = self._seq
 
     if writedata:
-      length = min(len(writedata), cmdsize-2)
+      length = min(len(writedata), self._cmdsize-2)
       for i in range(length):
         cmd[i+1] = writedata[i]
 
-    sendsize = self.device.write(self.outEpAddr, cmd, timeout=self._timeout)
-    if sendsize != cmdsize:
+    sendsize = self._device.write(self._outEpAddr, cmd, timeout=self._timeout)
+    if sendsize != self._cmdsize:
       return None
 
     if do_read:
-      data = self.device.read(self.inEpAddr, cmdsize, timeout=self._timeout)
-      if data[0] != cmd[0] or data[cmdsize-1] != cmd[cmdsize-1]:
+      data = self._device.read(self._inEpAddr, self._cmdsize, timeout=self._timeout)
+      if data[0] != cmd[0] or data[self._cmdsize-1] != cmd[self._cmdsize-1]:
         raise ValueError("Different recived data.")
-      return data[1:cmdsize-1]
+      return data[1:self._cmdsize-1]
     else:
       return []
 
