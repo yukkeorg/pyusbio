@@ -13,12 +13,15 @@ pyusbio
 --------
  * 現在１つのUSB-IOしか認識できません。
  * 動作を確認しているOSはLinuxのみとなります。
- 　Windows環境での動作テストを行なっていません。 
+   Windows環境での動作テストを行なっていません。 
+
+Python3
+-------
+対応済
 
 ライセンス
 ----------
- 2条項BSDライセンス  
- 2-clause BSD License
+2条項BSDライセンス(2-clause BSD License)
 
 おまけ
 ------
