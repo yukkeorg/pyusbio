@@ -9,6 +9,10 @@ pyusbio
     ...   port0, port1 = usbio.send2read([0x00, 0x01])
     ...   print("{0:x}, {1:x}".format(port0, port1))
 
+必須ライブラリ
+--------------
+ * PyUSB
+
 制限事項
 --------
  * 現在１つのUSB-IOしか認識できません。
@@ -21,7 +25,7 @@ Python3
 
 ライセンス
 ----------
-2条項BSDライセンス(2-clause BSD License)
+BSD License
 
 おまけ
 ------
