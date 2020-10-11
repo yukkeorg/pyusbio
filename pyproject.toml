@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "pyusbio"
+version = "0.1.0"
+description = "USB0-IO2 control library for Python"
+authors = ["Yusuke Ohshima <ohshima.yusuke@yukke.org>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+pyusb = "^1.1.0"
+
+[tool.poetry.dev-dependencies]
+
+[tool.poetry.scripts]
+usbio_config = "pyusbio.usbio_config:main"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

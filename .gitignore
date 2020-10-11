@@ -1,6 +1,8 @@
 *.py[co]
+__pycache__
 
-# Packages
+.venv/
+
 *.egg
 *.egg-info
 dist
@@ -12,17 +14,10 @@ var
 sdist
 develop-eggs
 .installed.cfg
-
-# Installer logs
 pip-log.txt
-
-# Unit test / coverage reports
 .coverage
 .tox
-
-#Translations
 *.mo
 
-#Mr Developer
 *.sw[po]
 

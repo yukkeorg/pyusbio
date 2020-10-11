@@ -1,0 +1,16 @@
+[[package]]
+category = "main"
+description = "Python USB access module"
+name = "pyusb"
+optional = false
+python-versions = "*"
+version = "1.1.0"
+
+[metadata]
+content-hash = "b1f467faec4d28df3e2c9bf9d0f50894948d4f1dffbbb382e137593dc86d6960"
+python-versions = "^3.6"
+
+[metadata.files]
+pyusb = [
+    {file = "pyusb-1.1.0.tar.gz", hash = "sha256:d69ed64bff0e2102da11b3f49567256867853b861178689671a163d30865c298"},
+]
