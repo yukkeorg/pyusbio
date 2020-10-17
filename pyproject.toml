@@ -1,9 +1,20 @@
 [tool.poetry]
 name = "pyusbio"
-version = "0.1.2"
-description = "USB0-IO2 control library for Python"
+version = "0.1.3"
+description = "USB-IO2 control library for Python"
+readme = "README.md"
 authors = ["Yusuke Ohshima <ohshima.yusuke@yukke.org>"]
+homepage = "https://github.com/yukkeorg"
+repository = "https://github.com/yukkeorg/pyusbio"
 license = "MIT"
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+]
+
 
 [tool.poetry.dependencies]
 python = "^3.6"
