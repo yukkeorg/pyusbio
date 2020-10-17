@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyusbio"
-version = "0.1.1"
+version = "0.1.2"
 description = "USB0-IO2 control library for Python"
 authors = ["Yusuke Ohshima <ohshima.yusuke@yukke.org>"]
 license = "MIT"

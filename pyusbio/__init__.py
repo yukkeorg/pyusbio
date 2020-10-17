@@ -3,12 +3,28 @@
 # This software is under MIT License.
 # for more details, please see LICENSE file.
 
+import os
 import usb.core
 import usb.util
 
 import logging
-logger = logging.getLogger('PyUSBIO')
 
+
+def _setup_logger():
+    logger = logging.getLogger('PyUSBIO')
+    debug_level = os.environ.get("PYUSBIO_LOGLEVEL")
+    if debug_level is not None:
+        logger.setLevel(debug_level)
+        handler = logging.StreamHandler()
+        fmt = logging.Formatter('%(asctime)s %(levelname)s:%(name)s:%(message)s')
+        handler.setFormatter(fmt)
+        logger.addHandler(handler)
+    else:
+        logger.addHandler(logging.NullHandler())
+    return logger
+
+
+logger = _setup_logger()
 
 # Device Information
 VENDOR_ID = 0x1352        # Km2Net
