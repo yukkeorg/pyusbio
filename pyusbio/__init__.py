@@ -87,11 +87,15 @@ class USBIO(object):
                                      "".format(ifc.bInterfaceNumber,
                                                ep.bEndpointAddress))
 
-                if self._device.is_kernel_driver_active(ifc.bInterfaceNumber):
-                    self._device.detach_kernel_driver(ifc.bInterfaceNumber)
-                    logger.debug(
-                            "interface {0} is detached from kernel driver."
-                            "".format(ifc.bInterfaceNumber))
+                try:
+                    if self._device.is_kernel_driver_active(ifc.bInterfaceNumber):
+                        self._device.detach_kernel_driver(ifc.bInterfaceNumber)
+                        logger.debug(
+                                "interface {0} is detached from kernel driver."
+                                "".format(ifc.bInterfaceNumber))
+                except NotImplementedError:
+                    logger.debug("is_kernel_driver_active' "
+                                 "method not implemented on this platform.")
         return True
 
     def _cmd(self, command, writedata=None, do_read=True):
@@ -112,7 +116,7 @@ class USBIO(object):
         sendsize = self._device.write(self._outEpAddr, cmd,
                                       timeout=self._timeout)
         if sendsize != self._cmdsize:
-            return None
+            logger.debug("sendsize({}) != cmdsize({})".format(sendsize, self._cmdsize))
 
         if do_read:
             data = self._device.read(self._inEpAddr, self._cmdsize,
