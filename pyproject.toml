@@ -21,6 +21,7 @@ python = "^3.6"
 pyusb = "^1.1.0"
 
 [tool.poetry.dev-dependencies]
+pytest = "^6.2.5"
 
 [tool.poetry.scripts]
 usbio_config = "pyusbio.usbio_config:main"
